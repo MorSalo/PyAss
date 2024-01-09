@@ -7,7 +7,8 @@ b = Num(random.randint(-100,100))
 c = Num(random.randint(-100,100))
 d = Num(random.randint(-100,100))
 
-print(f"a.x: {a.x} b.x: {b.x}")
+#mine
+print(f"a.x: {a.x} b.x: {b.x} c.x: {c.x} d.x: {d.x}")
 
 if Plus(a,b).calc() != a.calc()+b.calc():
     print("problem with Plus (-10)")
@@ -22,8 +23,14 @@ x = Div(a,b).calc()
 if x > a.calc()/b.calc()+0.01 or x < a.calc()/b.calc()-0.01:
     print("problem with Div (-10)")
 
-if Plus(a,Mul(b,Minus(c,d))).calc() != a.calc()+b.calc()*(c.calc()-d.calc()) :
+ex1 = Plus(a,Mul(b,Minus(c,d))).calc()
+ex2 = a.calc()+b.calc()*(c.calc()-d.calc())
+
+if ex1 != ex2:
     print("problem with expression (-10)")
+
+# if Plus(a,Mul(b,Minus(c,d))).calc() != a.calc()+b.calc()*(c.calc()-d.calc()) :
+#     print("problem with expression (-10)")
 
 
 def strf(x) -> string:
@@ -50,5 +57,17 @@ s = sa+'*('+sa+'+'+sb+'*('+sc+'-'+sd+'+'+sb+'))'
 if parser(s) != eval(s) :
     print("problem with parser (-20)")
 
+
+
+# stack = deque()
+# stack.append(1)
+# stack.append(2)
+# stack.append(3)
+# stack.append(4)
+# print(f"stack[0]: {stack[0]}")
+# print(f"stack[-1]: {stack[-1]}")
+# print(f"stack.pop(): {stack.pop()}")
+# stack.clear()
+# print(f"stack clear [0]: {stack[0]}")
 
 print("done")

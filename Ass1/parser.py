@@ -1,6 +1,7 @@
 from abc import ABC
 from numpy import double
 from abc import ABC, abstractmethod
+from collections import deque
 
 
 class Expression(ABC):
@@ -16,6 +17,7 @@ class Num(Expression):
         if isinstance(x, int):
             self.x = int(x)
         else:
+            print("problem with Num initialization")
             self.x = 0
 
     def calc(self) -> double:
@@ -24,17 +26,17 @@ class Num(Expression):
 
 class BinExp(Expression):
 
-    def __init__(self, r, l):
-        if isinstance(r, BinExp):
-            self.right = BinExp(r.right, r.left)
-        elif isinstance(r, Num):
-            self.right = Num(r.x)
+    def __init__(self, left, right):
+        if isinstance(left, BinExp):
+            self.left = left
+        elif isinstance(left, Num):
+            self.left = Num(left.x)
         else:
             print("right BinExp init error")
-        if isinstance(l, BinExp):
-            self.left = BinExp(l.right, l.left)
-        elif isinstance(l, Num):
-            self.left = Num(l)
+        if isinstance(right, BinExp):
+            self.right = right
+        elif isinstance(right, Num):
+            self.right = Num(right.x)
         else:
             print("left BinExp init error")
 
@@ -44,8 +46,8 @@ class BinExp(Expression):
 
 class Div(BinExp):
 
-    def __init__(self, r, l):
-        BinExp.__init__(self, r, l)
+    def __init__(self, left, right):
+        BinExp.__init__(self, left, right)
 
     def calc(self) -> double:
         return self.left.calc() / self.right.calc()
@@ -53,34 +55,107 @@ class Div(BinExp):
 
 class Plus(BinExp):
 
-    def __init__(self, r, l):
-        BinExp.__init__(self, r, l)
+    def __init__(self, left, right):
+        BinExp.__init__(self, left, right)
 
     def calc(self) -> double:
         lefta = self.left.calc()
         rightb = self.right.calc()
-        sum = rightb+lefta
+        sum = lefta + rightb
         return sum
+        # return self.left.calc() + self.right.calc()
 
 
 class Minus(BinExp):
 
-    def __init__(self, r, l):
-        BinExp.__init__(self, r, l)
+    def __init__(self, left, right):
+        BinExp.__init__(self, left, right)
 
     def calc(self) -> double:
-        return self.left.calc() - self.right.calc()
+        lefta = self.left.calc()
+        rightb = self.right.calc()
+        sum = lefta - rightb
+        return sum
+        # return self.left.calc() - self.right.calc()
 
 
 class Mul(BinExp):
 
-    def __init__(self, r, l):
-        BinExp.__init__(self, r, l)
+    def __init__(self, left, right):
+        BinExp.__init__(self, left, right)
 
     def calc(self) -> double:
         return self.left.calc() * self.right.calc()
 
 
 # implement the parser function here
+def isOperator(c):
+    if c == '+' or c == '-' or c == '*' or c == '/':
+        return 1
+    else:
+        return 0
+
+
+def isNumber(c):
+    try:
+        return int(c)
+    except Exception:
+        return 0
+
+
+def isLeftParen(c):
+    return c == '('
+
+
+def isRightParen(c):
+    return c == ')'
+
+
+def notEmpty(s):
+    s = deque(s)
+    try:
+        return s[0]
+    except Exception:
+        return 0
+
+
+# 0- do not change
+# 1- change!
+def precedence(c, x):
+    if isOperator(c):
+        if c == '*' or c == '/':
+            return 0
+        if (c == '+' or c == '-') and (x == '*' or x == '/'):
+            return 1
+    else:
+        return 0
+
+
 def parser(expression) -> double:
+    if isinstance(expression, str):
+        expression = str(expression)
+    else:
+        print("expression in parser isn't string")
+    queue = []
+    stack = deque()
+
+    for c in expression:
+        if isNumber(c):
+            queue.append(c)
+        elif isOperator(c):
+            while notEmpty(stack) and precedence(c, stack[-1]):
+                queue.append(stack.pop())
+            stack.append(c)
+        elif isLeftParen(c):
+            stack.append(c)
+        elif isRightParen(c):
+            while notEmpty(stack) and not isLeftParen(stack[-1]):
+                queue.append(stack.pop())
+            stack.pop()
+        else:
+            print(f"error: c isn't anything in expression: {c}")
+
+    print(f"queue: {queue}")
+    print(f"stack: {stack}")
+
     return 0.0
