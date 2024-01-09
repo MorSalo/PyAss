@@ -49,6 +49,7 @@ if parser(s) != eval(s) :
     print("problem with parser (-10)")
 
 
+
 s = sa+'*'+sa+'+'+sb+'*('+sc+'-'+sd+'+'+sb+')'
 if parser(s) != eval(s) :
     print("problem with parser (-20)")

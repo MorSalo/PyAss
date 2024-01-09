@@ -155,6 +155,7 @@ def parser(expression) -> double:
         else:
             print(f"error: c isn't anything in expression: {c}")
 
+
     print(f"queue: {queue}")
     print(f"stack: {stack}")
 
