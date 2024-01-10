@@ -2,6 +2,7 @@ from abc import ABC
 from numpy import double
 from abc import ABC, abstractmethod
 from collections import deque
+import queue as q
 
 
 class Expression(ABC):
@@ -17,7 +18,6 @@ class Num(Expression):
         if isinstance(x, int):
             self.x = int(x)
         else:
-            print("problem with Num initialization")
             self.x = 0
 
     def calc(self) -> double:
@@ -31,14 +31,11 @@ class BinExp(Expression):
             self.left = left
         elif isinstance(left, Num):
             self.left = Num(left.x)
-        else:
-            print("right BinExp init error")
+
         if isinstance(right, BinExp):
             self.right = right
         elif isinstance(right, Num):
             self.right = Num(right.x)
-        else:
-            print("left BinExp init error")
 
     def calc(self) -> double:
         return 0.0
@@ -98,9 +95,10 @@ def isOperator(c):
 
 def isNumber(c):
     try:
-        return int(c)
+        int(c)
+        return True
     except Exception:
-        return 0
+        return False
 
 
 def isLeftParen(c):
@@ -125,38 +123,106 @@ def precedence(c, x):
     if isOperator(c):
         if c == '*' or c == '/':
             return 0
+        if (c == '+' and x == '-') or (c == '-' and x == '+'):
+            return 1
         if (c == '+' or c == '-') and (x == '*' or x == '/'):
             return 1
     else:
         return 0
 
 
-def parser(expression) -> double:
-    if isinstance(expression, str):
-        expression = str(expression)
-    else:
-        print("expression in parser isn't string")
+def isMinus(c):
+    return c == "-"
+
+
+def shuntingYard(expression) -> list:
     queue = []
     stack = deque()
+    i = 0
 
-    for c in expression:
+    while i < len(expression):
+        c = expression[i]
         if isNumber(c):
-            queue.append(c)
+            num = c
+            j = i + 1
+            while isNumber(expression[j]):
+                num += expression[j]
+                j += 1
+            queue.append(num)
+            i = j - 1
         elif isOperator(c):
             while notEmpty(stack) and precedence(c, stack[-1]):
                 queue.append(stack.pop())
             stack.append(c)
         elif isLeftParen(c):
-            stack.append(c)
+            if expression[i + 1] == "-":
+                num = expression[i + 1]
+                j = i + 2
+                while isNumber(expression[j]):
+                    num += expression[j]
+                    j += 1
+                queue.append(num)
+                i = j
+            else:
+                stack.append(c)
         elif isRightParen(c):
             while notEmpty(stack) and not isLeftParen(stack[-1]):
                 queue.append(stack.pop())
-            stack.pop()
-        else:
-            print(f"error: c isn't anything in expression: {c}")
+            if notEmpty(stack):
+                stack.pop()
 
 
-    print(f"queue: {queue}")
-    print(f"stack: {stack}")
+        i += 1
 
-    return 0.0
+    while notEmpty(stack):
+        queue.append(stack.pop())
+
+    return queue
+
+
+def parser(expression) -> double:
+    if isinstance(expression, str):
+        expression = str(expression)
+
+    queue = shuntingYard(expression)
+    helper = deque()
+    i = 0
+    for my in queue:
+        if isNumber(my):
+            helper.append(Num(int(my)))
+        if isOperator(my):
+
+            if notEmpty(helper):
+                right = helper.pop()
+                if notEmpty(helper):
+                    left = helper.pop()
+                else:
+                    continue
+            else:
+                continue
+
+            exp = 0
+            if my == "+":
+                exp = Plus(left, right)
+            elif my == "-":
+                exp = Minus(left, right)
+            elif my == "*":
+                exp = Mul(left, right)
+            elif my == "/":
+                exp = Div(left, right)
+
+            # match my:
+            #     case "+":
+            #         exp = Plus(left, right)
+            #     case "-":
+            #         exp = Minus(left, right)
+            #     case "*":
+            #         exp = Mul(left, right)
+            #     case "/":
+            #         exp = Div(left, right)
+
+            helper.append(exp)
+
+        i += 1
+
+    return helper.pop().calc()

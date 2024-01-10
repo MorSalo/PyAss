@@ -2,63 +2,64 @@ from parser import *
 import random
 import string
 
-a = Num(random.randint(-100,100))
-b = Num(random.randint(-100,100))
-c = Num(random.randint(-100,100))
-d = Num(random.randint(-100,100))
+a = Num(random.randint(-100, 100))
+b = Num(random.randint(-100, 100))
+c = Num(random.randint(-100, 100))
+d = Num(random.randint(-100, 100))
 
-#mine
+# mine
 print(f"a.x: {a.x} b.x: {b.x} c.x: {c.x} d.x: {d.x}")
 
-if Plus(a,b).calc() != a.calc()+b.calc():
+if Plus(a, b).calc() != a.calc() + b.calc():
     print("problem with Plus (-10)")
 
-if Minus(a,b).calc() != a.calc()-b.calc():
+if Minus(a, b).calc() != a.calc() - b.calc():
     print("problem with Minus (-10)")
 
-if Mul(a,b).calc() != a.calc()*b.calc():
+if Mul(a, b).calc() != a.calc() * b.calc():
     print("problem with Mul (-10)")
 
-x = Div(a,b).calc()
-if x > a.calc()/b.calc()+0.01 or x < a.calc()/b.calc()-0.01:
+x = Div(a, b).calc()
+if x > a.calc() / b.calc() + 0.01 or x < a.calc() / b.calc() - 0.01:
     print("problem with Div (-10)")
 
-ex1 = Plus(a,Mul(b,Minus(c,d))).calc()
-ex2 = a.calc()+b.calc()*(c.calc()-d.calc())
+ex1 = Plus(a, Mul(b, Minus(c, d))).calc()
+ex2 = a.calc() + b.calc() * (c.calc() - d.calc())
 
 if ex1 != ex2:
     print("problem with expression (-10)")
+
 
 # if Plus(a,Mul(b,Minus(c,d))).calc() != a.calc()+b.calc()*(c.calc()-d.calc()) :
 #     print("problem with expression (-10)")
 
 
 def strf(x) -> string:
-    s=str(x)
+    s = str(x)
     if s.startswith('-'):
-        s="("+s+")"
+        s = "(" + s + ")"
     return s
+
 
 sa = strf(a.calc())
 sb = strf(b.calc())
 sc = strf(c.calc())
 sd = strf(d.calc())
 
-s = sa+'+'+sb+'*('+sc+'-'+sd+')'
-if parser(s) != eval(s) :
+s = sa + '+' + sb + '*(' + sc + '-' + sd + ')'
+print(f"{s}\n{eval(s)}")
+if parser(s) != eval(s):
     print("problem with parser (-10)")
 
-
-
-s = sa+'*'+sa+'+'+sb+'*('+sc+'-'+sd+'+'+sb+')'
-if parser(s) != eval(s) :
+s = sa + '*' + sa + '+' + sb + '*(' + sc + '-' + sd + '+' + sb + ')'
+print(f"{s}\n{eval(s)}")
+if parser(s) != eval(s):
     print("problem with parser (-20)")
 
-s = sa+'*('+sa+'+'+sb+'*('+sc+'-'+sd+'+'+sb+'))'
-if parser(s) != eval(s) :
+s = sa + '*(' + sa + '+' + sb + '*(' + sc + '-' + sd + '+' + sb + '))'
+print(f"{s}\n{eval(s)}")
+if parser(s) != eval(s):
     print("problem with parser (-20)")
-
-
 
 # stack = deque()
 # stack.append(1)
@@ -70,5 +71,6 @@ if parser(s) != eval(s) :
 # print(f"stack.pop(): {stack.pop()}")
 # stack.clear()
 # print(f"stack clear [0]: {stack[0]}")
+#x= int("-84")
 
 print("done")
